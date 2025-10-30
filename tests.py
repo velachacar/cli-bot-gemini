@@ -37,9 +37,16 @@ print(write_file("calculator", "pkg/morelorem.txt", "lorem ipsum dolor sit amet"
 print(write_file("calculator", "/tmp/temp.txt", "this should not be allowed")) 
 """
 
+"""
 print(run_python_file("calculator", "main.py"))
 print(run_python_file("calculator", "main.py", ["3 + 5"])) #(should run the calculator... which gives a kinda nasty rendered result)
 print(run_python_file("calculator", "tests.py"))
 print(run_python_file("calculator", "../main.py")) #(this should return an error)
 print(run_python_file("calculator", "nonexistent.py")) #(this should return an error)
-print(run_python_file("calculator", "lorem.txt")) #(this should return an error)
+print(run_python_file("calculator", "lorem.txt")) #(this should return an error) 
+"""
+
+get_file_content({'file_path': 'main.py'})  # read the contents of main.py
+write_file({'file_path': 'main.txt', 'content': 'hello'})  # write 'hello' to main.txt
+run_python_file({'file_path': 'main.py'})  # run main.py
+get_files_info({'directory': 'pkg'})  # list the contents of the pkg directory
