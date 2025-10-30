@@ -36,13 +36,44 @@ def main():
         messages = [
             types.Content(role="user", parts=[types.Part(text=user_prompt)]),
         ]
+        for i in range(20):
+            try:
+                response = client.models.generate_content(
+                    model='gemini-2.0-flash-001',
+                    contents=messages,
+                    config=types.GenerateContentConfig(tools=[available_functions], system_instruction=SYSTEM_PROMPT),
+                )
+                is_called_tool = False
 
-        response = client.models.generate_content(
-            model='gemini-2.0-flash-001',
-            contents=messages,
-            config=types.GenerateContentConfig(tools=[available_functions], system_instruction=SYSTEM_PROMPT),
-        )
+                for candidate in response.candidates:
+                    messages.append(candidate.content)
 
+                    fn_calls = [p for p in candidate.content.parts if getattr(p, "function_call", None)]
+                    for fn_call in fn_calls:
+                        is_called_tool = True
+                        call_obj = fn_call.function_call
+                        fn_call_result = call_function(call_obj, verbose)
+
+                        fn_response = fn_call_result.parts[0].function_response
+                        if not fn_response or not fn_response.response:
+                            raise Exception("Error: no tool response")
+
+                        messages.append(
+                            types.Content(role="user", parts=[types.Part(function_response=fn_response)])
+                        )
+                        
+                        if verbose:
+                            print(f"-> {fn_response.response}")
+                
+                if not is_called_tool and response.text:
+                    print("Final response:")
+                    print(response.text)
+                    break
+            except Exception as e:
+                if verbose:
+                    print(f"Error: {e}")
+                break
+            
 
         
 
@@ -50,27 +81,10 @@ def main():
         print('incorrect arguments')
         sys.exit(1)
 
-    if(verbose):
+    if verbose:
         print(f"User prompt: {user_prompt}")
         print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
         print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
 
-    if response.function_calls:
-            for function_call_part in response.function_calls:
-                print(f"Calling function: {function_call_part.name}({function_call_part.args})")
-                function_call_result = call_function(function_call_part, verbose)
-                response = function_call_result.parts[0].function_response.response
-                if not response:
-                    raise Exception("Error: no tool response")
-                else:
-                    if verbose:
-                        print(f"-> {response}")
-
-                
-
-    else:
-        print(response.text)
-
-    
 if __name__ == "__main__":
     main()
