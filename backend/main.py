@@ -3,7 +3,7 @@ import sys
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-from config import SYSTEM_PROMPT
+from config import SYSTEM_PROMPT, AI_MODEL
 from functions.get_files_info import schema_get_files_info
 from functions.get_file_content import schema_get_file_content
 from functions.write_file import schema_write_file
@@ -22,7 +22,7 @@ def main():
         verbose = True
     
     if len(args):
-        user_prompt = sys.argv[1]
+        user_prompt = args[0]
 
         available_functions = types.Tool(
             function_declarations=[
@@ -39,9 +39,9 @@ def main():
         for i in range(20):
             try:
                 response = client.models.generate_content(
-                    model='gemini-2.0-flash-001',
+                    model=AI_MODEL,
                     contents=messages,
-                    config=types.GenerateContentConfig(tools=[available_functions], system_instruction=SYSTEM_PROMPT),
+                    config=types.GenerateContentConfig(tools=[available_functions], system_instruction=SYSTEM_PROMPT ),
                 )
                 is_called_tool = False
 
@@ -59,7 +59,7 @@ def main():
                             raise Exception("Error: no tool response")
 
                         messages.append(
-                            types.Content(role="user", parts=[types.Part(function_response=fn_response)])
+                            types.Content(role="tool", parts=[types.Part(function_response=fn_response)])
                         )
                         
                         if verbose:
@@ -67,7 +67,7 @@ def main():
                 
                 if not is_called_tool and response.text:
                     print("Final response:")
-                    print(response.text)
+                    print(f"{response.text}")
                     break
             except Exception as e:
                 if verbose:
@@ -82,6 +82,7 @@ def main():
         sys.exit(1)
 
     if verbose:
+        print("verbose")
         print(f"User prompt: {user_prompt}")
         print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
         print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
