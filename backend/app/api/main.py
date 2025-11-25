@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import subprocess
 import os
+import sys
 
 app = FastAPI()
 
@@ -28,7 +29,7 @@ async def root():
 
 @app.post("/get_response")
 async def get_response(user_prompt: UserPrompt):
-    args = ['python', 'main.py']
+    args = [sys.executable, 'main.py']
     if user_prompt.isVerbose == True:
         args.append('--verbose')
     args.append(user_prompt.prompt)
