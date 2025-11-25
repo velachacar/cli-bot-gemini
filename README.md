@@ -36,7 +36,7 @@ uv sync
 ### Run dev server
 
 ``` bash
-uv run fastapi dev app/api/main.py
+uv run uvicorn app.api.main:app --host 127.0.0.1 --port 8000
 ```
 
 FastAPI will run at:
@@ -84,7 +84,14 @@ Run both servers in two terminals:
 
 ``` bash
 cd backend
-uv run fastapi dev app/api/main.py
+source .venv/Scripts/activate.fish
+uv run uvicorn app.api.main:app --host 127.0.0.1 --port 8000
+```
+
+If you want to deactivate the virtual environment, just use deactivate:
+
+``` bash
+deactivate
 ```
 
 ### Frontend
