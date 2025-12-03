@@ -96,7 +96,7 @@ function App() {
           {isVerbose?' verbose':' default'}
         </Button>
         </h1>
-        <div className='bg-buttons ms-auto d-flex align-items-center'>
+        <div className='bg-buttons ms-md-auto d-flex align-items-center'>
           <Button className={`bg-btn base-bg`} onClick={()=>setBackground("base-bg")} />
           <Button className={`bg-btn red-bg`} onClick={()=>setBackground("red-bg")} />
           <Button className={`bg-btn green-bg`} onClick={()=>setBackground("green-bg")} />
